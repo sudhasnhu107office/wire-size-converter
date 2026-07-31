@@ -1,1 +1,488 @@
+<!DOCTYPE html>
+<html>
+<head>
 
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Wire Size Converter</title>
+
+
+<style>
+
+*{
+  box-sizing:border-box;
+}
+
+
+body{
+
+  font-family:Arial, sans-serif;
+
+  background:#f2f2f2;
+
+  margin:0;
+
+  padding:15px;
+
+  min-height:100vh;
+
+}
+
+
+.container{
+
+  width:min(100%,450px);
+
+  margin:auto;
+
+  background:white;
+
+  padding:25px;
+
+  border-radius:12px;
+
+  box-shadow:0 3px 12px rgba(0,0,0,.18);
+
+}
+
+
+
+h2{
+
+  text-align:center;
+
+  color:#1565C0;
+
+  font-size:26px;
+
+  margin-top:0;
+
+}
+
+
+
+label{
+
+  font-weight:bold;
+
+  display:block;
+
+  margin-top:18px;
+
+}
+
+
+
+input,
+select{
+
+  width:100%;
+
+  padding:12px;
+
+  margin-top:6px;
+
+  font-size:16px;
+
+  border:1px solid #bbb;
+
+  border-radius:6px;
+
+}
+
+
+
+input:focus,
+select:focus{
+
+  outline:none;
+
+  border-color:#1565C0;
+
+}
+
+
+
+button{
+
+  width:100%;
+
+  margin-top:22px;
+
+  padding:13px;
+
+  font-size:17px;
+
+  font-weight:bold;
+
+  background:#1565C0;
+
+  color:white;
+
+  border:none;
+
+  border-radius:6px;
+
+  cursor:pointer;
+
+}
+
+
+
+button:hover{
+
+  background:#0D47A1;
+
+}
+
+
+
+#result{
+
+  margin-top:25px;
+
+  padding:15px;
+
+  background:#f8f9fa;
+
+  border:1px solid #ddd;
+
+  border-radius:8px;
+
+  display:none;
+
+}
+
+
+
+table{
+
+  width:100%;
+
+  border-collapse:collapse;
+
+}
+
+
+td{
+
+  padding:8px;
+
+  font-size:17px;
+
+}
+
+
+
+td:first-child{
+
+  font-weight:bold;
+
+}
+
+
+
+.loading{
+
+  text-align:center;
+
+  color:#1565C0;
+
+}
+
+
+
+@media(max-width:400px){
+
+  body{
+
+    padding:10px;
+
+  }
+
+
+  .container{
+
+    padding:18px;
+
+  }
+
+
+  td{
+
+    font-size:15px;
+
+  }
+
+}
+
+
+</style>
+
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+<h2>
+Wire Size Converter
+</h2>
+
+
+<label>
+Enter Size
+</label>
+
+
+<input 
+type="number"
+id="size"
+step="0.0001"
+placeholder="Enter size">
+
+
+<label>
+Select Unit
+</label>
+
+
+<select id="unit">
+
+<option value="swg">
+SWG
+</option>
+
+<option value="inch">
+Diameter Inch
+</option>
+
+<option value="mm">
+Diameter MM
+</option>
+
+</select>
+
+
+
+<button onclick="convert()">
+Convert
+</button>
+
+
+
+<div id="result"></div>
+
+
+
+</div>
+
+
+
+<script>
+
+
+// Replace this with your Apps Script Web App URL
+
+const API_URL =
+"https://script.google.com/macros/s/YOUR_APPS_SCRIPT_WEB_APP_URL/exec";
+
+
+
+
+
+function convert(){
+
+
+let size =
+document.getElementById("size").value;
+
+
+let unit =
+document.getElementById("unit").value;
+
+
+
+if(size===""){
+
+alert("Please enter size.");
+
+return;
+
+}
+
+
+
+showLoading();
+
+
+
+fetch(API_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+value:Number(size),
+
+unit:unit
+
+})
+
+})
+
+
+.then(response=>response.json())
+
+
+.then(data=>{
+
+
+showResult(data);
+
+
+})
+
+
+.catch(error=>{
+
+
+document.getElementById("result").style.display="block";
+
+
+document.getElementById("result").innerHTML=
+
+"<b>Error connecting to converter.</b>";
+
+
+console.log(error);
+
+
+});
+
+
+}
+
+
+
+
+
+
+function showLoading(){
+
+
+let result =
+document.getElementById("result");
+
+
+result.style.display="block";
+
+
+result.innerHTML=
+
+"<div class='loading'>Converting...</div>";
+
+
+
+}
+
+
+
+
+
+function showResult(r){
+
+
+
+let result =
+document.getElementById("result");
+
+
+
+if(!r){
+
+
+result.innerHTML=
+
+"<b>No matching record found.</b>";
+
+
+return;
+
+
+}
+
+
+
+result.innerHTML=`
+
+<table>
+
+<tr>
+
+<td>SWG</td>
+
+<td>${r.swg} No.</td>
+
+</tr>
+
+
+<tr>
+
+<td>Diameter Inch</td>
+
+<td>${r.inch}"</td>
+
+</tr>
+
+
+<tr>
+
+<td>Diameter MM</td>
+
+<td>${r.mm} mm</td>
+
+</tr>
+
+
+</table>
+
+`;
+
+
+
+}
+
+
+
+
+// Press Enter to Convert
+
+document
+.getElementById("size")
+.addEventListener("keypress",function(e){
+
+
+if(e.key==="Enter"){
+
+convert();
+
+}
+
+
+});
+
+
+
+</script>
+
+
+</body>
+
+</html>
